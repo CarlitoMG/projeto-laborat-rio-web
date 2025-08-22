@@ -1,0 +1,30 @@
+###Inserir pelo http
+GET http://localhost:8080/api/clientes/cliente2/Carlito
+
+###Inserindo dois numeros pelo http
+GET http://localhost:8080/api/clientes/cliente1/30/50
+
+###tInserindo pelo Corpo da aplicação
+POST http://localhost:8080/api/clientes
+Content-Type: application/json
+
+{
+    "id": 16,
+    "nome": "Veronica"
+}
+
+### Listar Clientes
+GET  http://localhost:8080/api/clientes/listarClientes
+
+### Remover Cliente
+
+DELETE http://localhost:8080/api/clientes/16
+
+###Alterar Cliente pelo Corpo da aplicação
+PUT http://localhost:8080/api/clientes/16
+Content-Type: application/json
+
+{
+    "id": 17,
+    "nome": "VeronicaM"
+}
