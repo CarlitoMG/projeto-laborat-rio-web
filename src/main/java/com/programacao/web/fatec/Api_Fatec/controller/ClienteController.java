@@ -2,6 +2,8 @@ package com.programacao.web.fatec.Api_Fatec.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.programacao.web.fatec.Api_Fatec.entities.Cliente;
+
+import jakarta.annotation.PostConstruct;
+import com.programacao.web.fatec.Api_Fatec.domain.cliente.ClienteRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
@@ -20,19 +25,31 @@ public class ClienteController {
 
     private final List<Cliente> listaDeCliente = new ArrayList<>();
 
+    @Autowired
+    private ClienteRepository clienteRepository;
+
     public ClienteController(){
         //1 forma
-        listaDeCliente.add(new Cliente(1L,"Carlito"));
+        listaDeCliente.add(new Cliente(1L,"Carlito", "rua xxx"));
 
         //2 forma
         Cliente cliente2 = new Cliente();
         cliente2.setId(2L);
         cliente2.setNome("Diego");
+        cliente2.setEndereco("Rua xxx");
         listaDeCliente.add(cliente2);
+    
     }
+@PostConstruct()
+public void dadosIniciais(){
+    clienteRepository.save(new Cliente( null, "Carlito", "rua ccc"));
+    clienteRepository.save(new Cliente( null, "Carlito1", "rua ccc"));
+    clienteRepository.save(new Cliente( null,"Carlito2", "rua ccc"));
+}
+
     @GetMapping("/listarClientes")
     public List<Cliente> listarClientes() {
-        return listaDeCliente;
+        return clienteRepository.findAll();
     }
     
 
@@ -64,7 +81,7 @@ public class ClienteController {
         for(Cliente cliente: listaDeCliente){
             if(cliente.getId() == id){
                 listaDeCliente.remove(cliente);
-                return "OK";
+                return clienteRepository.deleteById(Long id);
             }
         }
         return "NÃO ENCONTRADO ID:"+id;
