@@ -28,7 +28,7 @@ public class ClienteController {
     @Autowired
     private ClienteRepository clienteRepository;
 
-    public ClienteController(){
+       public ClienteController(){
         //1 forma
         listaDeCliente.add(new Cliente(1L,"Carlito", "rua xxx"));
 
@@ -64,23 +64,23 @@ public void dadosIniciais(){
     
     @GetMapping("/cliente2/{nome}")
     public String testCliente2(@PathVariable String nome){
-
+        clienteRepository.getNome(name);
         return nome;
     }
     
     @PostMapping("")
     public Cliente createCliente(@RequestBody Cliente cliente){
 
-        listaDeCliente.add(cliente);
+        clienteRepository.createCliente(cliente);
 
         return cliente;
     }
 
     @DeleteMapping("/{id}")
     public String deletarCliente(@PathVariable Long id){
-        for(Cliente cliente: listaDeCliente){
+        for(clienteRepository.detelebyid(id)){
             if(cliente.getId() == id){
-                listaDeCliente.remove(cliente);
+                clienteRepository.remove(cliente);
                 return clienteRepository.deleteById(Long id);
             }
         }
@@ -91,7 +91,7 @@ public void dadosIniciais(){
     public String alterarCliente(@PathVariable Long id, @RequestBody Cliente entity) {
     
          for(Cliente cliente: listaDeCliente){
-            if(cliente.getId() == id){
+            if(clienteRepository.PostConstruct(Id)){
                 cliente.setId(entity.getId());
                 cliente.setNome( entity.getNome());
                 return "Id encontrado";
