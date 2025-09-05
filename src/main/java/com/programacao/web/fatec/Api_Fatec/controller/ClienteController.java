@@ -29,12 +29,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/api/clientes")
 public class ClienteController {
-
-    @Autowired
+         @Autowired
     private ClienteRepository clienteRepository;
 
     @Autowired
     private CidadeRepository cidadeRepository;
+
+    @Autowired
+    private ClienteService clienteService;
+
 
     /**
      * Método executado após a inicialização do contexto do Spring.
@@ -64,22 +67,14 @@ public class ClienteController {
 
     @GetMapping("/listarClientes")
     public List<Cliente> listarClientes() {
-        return clienteRepository.findAll();
+        return clienteService.listarClientes();
+        //return clienteRepository.findAll();
     }
 
     @GetMapping("/buscaPorIdOuNome/{search}")
     public List<Cliente> buscaPorIdOuNomeGenerico(@PathVariable String search) {
-        Long id = null;
-        try {
-            id = Long.parseLong(search);
-        } catch (Exception e) {
-            // TODO: handle exception
-            System.err.println(e.getMessage());
-        }
-
-        return clienteRepository.buscarPorIdOuNome(id, search);
+     return clienteService.buscarPorIdOuNomeGenerico(search);
     }
-
     @PostMapping("/buscaPorIdOuNome")
     public List<Cliente> buscaPorIdOuNome(@RequestBody BuscaPorIdOuNomeDto dto) {
         return clienteRepository.buscarPorIdOuNome(dto.getId(), dto.getNome());
@@ -99,19 +94,9 @@ public class ClienteController {
      */
     @GetMapping("/buscarPorTexto")
     public List<Cliente> buscarPorTexto(@RequestParam String texto) {
-        // Tenta converter o texto para Long para buscar por ID
-        Long idLong = null;
-        try {
-            idLong = Long.parseLong(texto);
-        } catch (NumberFormatException e) {
-            // Se não for possível converter para Long, deixa idLong como null
-            System.out.println("Texto não pode ser convertido para Long: " + texto);
-        }
-
-        // Chama o método do repositório com o texto e o possível ID
-        return clienteRepository.buscarPorIdOuNomeComCidade(texto, idLong);
-    }
-
+      return clienteService.buscarPorTexto(texto);
+    }        
+  
     /**
      * Cria um novo cliente.
      * Se o cliente tiver uma cidade associada (com ID), busca a cidade no banco de dados.
@@ -121,39 +106,12 @@ public class ClienteController {
      */
     @PostMapping("")
     public Cliente createCliente(@RequestBody Cliente cliente) {
-        cliente.setId(null);
-
-        // Verifica se o cliente tem uma cidade associada
-        if (cliente.getCidade() != null && cliente.getCidade().getId() != null) {
-            // Busca a cidade pelo ID
-            Optional<Cidade> cidadeOpt = cidadeRepository.findById(cliente.getCidade().getId());
-
-            // Se a cidade existir, associa ao cliente
-            if (cidadeOpt.isPresent()) {
-                cliente.setCidade(cidadeOpt.get());
-            } else {
-                // Se a cidade não existir, remove a associação
-                cliente.setCidade(null);
-            }
-        }
-
-        Cliente clienteCreated = clienteRepository.save(cliente);
-        return clienteCreated;
+      return clienteService.createCliente(cliente);
     }
 
     @DeleteMapping("/{id}")
     public String deletarCliente(@PathVariable Long id) {
-        //1º exemplo 
-        //clienteRepository.deleteById(id);
-
-        //2 exemplo
-        Optional<Cliente> clienteEncontrado = clienteRepository.findById(id);
-        if (clienteEncontrado.isPresent()) {
-            clienteRepository.deleteById(id);
-            return "Cliente Deletado";
-        }
-
-        return "NÃO ENCONTRADO ID:"+id;
+       return clienteService.deletarCliente(id);
     }
 
     /**
@@ -166,29 +124,6 @@ public class ClienteController {
      */
     @PutMapping("/{id}")
     public String alterarCliente(@PathVariable Long id, @RequestBody Cliente entity) {
-        Optional<Cliente> clienteEncontrado = clienteRepository.findById(id);
-        if (!clienteEncontrado.isPresent()) {
-            return String.format("NÃO ENCONTRADO ID: %s", id);
-        }
-
-        entity.setId(id);
-
-        // Verifica se o cliente tem uma cidade associada
-        if (entity.getCidade() != null && entity.getCidade().getId() != null) {
-            // Busca a cidade pelo ID
-            Optional<Cidade> cidadeOpt = cidadeRepository.findById(entity.getCidade().getId());
-
-            // Se a cidade existir, associa ao cliente
-            if (cidadeOpt.isPresent()) {
-                entity.setCidade(cidadeOpt.get());
-            } else {
-                // Se a cidade não existir, remove a associação
-                entity.setCidade(null);
-            }
-        }
-
-        clienteRepository.save(entity);
-        return "Cliente Atualizado com sucesso";
-    }
+        return clienteService.alterarCliente(id,entity);
 
 }
